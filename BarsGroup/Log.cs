@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.Timers;
 
 namespace BarsGroup
 {
     public class Log : ILog
     {
+        const double CheckInterval = 1000 * 60 * 30; // [мс]*[с]*[мин] Каждые 30 минут проверка
+        private int nowDay;
         private Dictionary<string, string> DayErrorCollection = new Dictionary<string, string>();
         private Dictionary<string, string> DayWarningCollection = new Dictionary<string, string>();
         private string LogFilePath;
@@ -15,12 +17,28 @@ namespace BarsGroup
         {
             this.LogFilePath = ApplicationPath + "\\logs\\" + DateTime.UtcNow.Year + "-" + DateTime.UtcNow.Month + "-" + DateTime.UtcNow.Day + ".txt";
             Init();
+            nowDay = DateTime.UtcNow.Day;
+            Timer inspector = new Timer(CheckInterval);
+            inspector.Elapsed += new ElapsedEventHandler(Checking);
+            inspector.Start();
+        }
+
+        private void Checking(object sender, ElapsedEventArgs e)
+        {
+            if (nowDay != DateTime.UtcNow.Day)
+            {
+                Init();
+                nowDay = DateTime.UtcNow.Day;
+            }
         }
 
         private void Init()
         {
             try
             {
+                DayErrorCollection.Clear();
+                DayWarningCollection.Clear();
+
                 if (!File.Exists(LogFilePath))
                 {
                     if (!Directory.Exists(ApplicationPath + "\\logs"))
@@ -39,9 +57,9 @@ namespace BarsGroup
                             string str = sr.ReadLine();
                             string[] arr = str.Split(" # ");
                             if (arr[1] == "ERROR")
-                                DayErrorCollection.Add(arr[2], arr[1]);
+                                DayErrorCollection.Add(arr[0], arr[2]);
                             if (arr[1] == "WARNING")
-                                DayWarningCollection.Add(arr[2], arr[1]);
+                                DayWarningCollection.Add(arr[0], arr[2]);
                         }
                     }
                 }
@@ -58,7 +76,7 @@ namespace BarsGroup
             {
                 using (StreamWriter sw = new StreamWriter(LogFilePath, true))
                 {
-                    sw.WriteLine(DateTime.UtcNow + " # " + e + " # " + message);
+                    sw.WriteLine("{0} # {1} # {2}", DateTime.UtcNow, message, e);
                 }
             }
             catch (Exception ex)
