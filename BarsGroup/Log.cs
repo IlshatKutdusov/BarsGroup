@@ -136,9 +136,11 @@ namespace BarsGroup
             try
             {
                 string value;
-                if (!DayErrorCollection.TryGetValue(message, out value))
-                    if (!DayErrorCollection.TryGetValue(e.Message, out value))
-                        SendToFile("ERROR", message);
+                if (!DayErrorCollection.TryGetValue(message + " " + e.Message, out value))
+                {
+                    SendToFile("ERROR", message + " " + e.Message);
+                    DayErrorCollection.Add(message + " " + e.Message, "ERROR");
+                }
             }
             catch (Exception ex)
             {
@@ -175,7 +177,10 @@ namespace BarsGroup
             {
                 string value;
                 if (!DayWarningCollection.TryGetValue(message, out value))
+                {
                     SendToFile("WARNING", message);
+                    DayWarningCollection.Add(message, "WARNING");
+                }
             }
             catch (Exception ex)
             {
