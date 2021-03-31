@@ -87,12 +87,10 @@ namespace BarsGroup
 
         public void Fatal(string message)
         {
-            //Process.GetCurrentProcess().Kill();
             SendToFile("FATAL", message);
         }
         public void Fatal(string message, Exception e)
         {
-            //Process.GetCurrentProcess().Kill();
             SendToFile("FATAL", message + " " + e.Message);
         }
         public void Error(string message)
@@ -136,11 +134,9 @@ namespace BarsGroup
             try
             {
                 string value;
-                if (!DayErrorCollection.TryGetValue(message + " " + e.Message, out value))
-                {
-                    SendToFile("ERROR", message + " " + e.Message);
-                    DayErrorCollection.Add(message + " " + e.Message, "ERROR");
-                }
+                if (!DayErrorCollection.TryGetValue(message, out value))
+                    if (!DayErrorCollection.TryGetValue(e.Message, out value))
+                        SendToFile("ERROR", message);
             }
             catch (Exception ex)
             {
