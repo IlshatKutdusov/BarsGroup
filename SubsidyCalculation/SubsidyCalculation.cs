@@ -37,33 +37,17 @@ namespace SubsidyCalculation
 
         private bool isCorrectData(Volume volumes, Tariff tariff)
         {
-            bool state = true;
             if (volumes.ServiceId != tariff.ServiceId)
-            {
                 InvalidInput("ServiceId", new Exception("Идентификаторы услуг у объёма и у тарифа не совпадают!"));
-                state = false;
-            }
             if (volumes.HouseId != tariff.HouseId)
-            {
                 InvalidInput("HouseId", new Exception("Идентификаторы домов у объёма и у тарифа не совпадают!"));
-                state = false;
-            }
             if (tariff.PeriodBegin.Month <= volumes.Month.Month && volumes.Month.Month <= tariff.PeriodEnd.Month)
-            {
                 InvalidInput("Month", new Exception("Месяц объёма не входит в период действия тарифа!"));
-                state = false;
-            }
             if (tariff.Value <= 0)
-            {
                 InvalidInput("Tariff Value", new Exception("Нулевое или отрицательное значение тарифа!"));
-                state = false;
-            }
             if (volumes.Value < 0)
-            {
                 InvalidInput("Volumes Value", new Exception("Отрицательное значение объема!"));
-                state = false;
-            }
-            return state;
+            return true;
         }
 
         private void InvalidInput(string message, Exception ex)
