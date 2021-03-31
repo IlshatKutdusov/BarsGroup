@@ -7,7 +7,7 @@ namespace BarsGroup
 {
     public class Log : ILog
     {
-        const double CheckInterval = 1000 * 60 * 30; // [мс]*[с]*[мин] Каждые 30 минут проверка
+        const double CheckInterval = 1000 * 60 * 30;
         private int nowDay;
         private Dictionary<string, string> DayErrorCollection = new Dictionary<string, string>();
         private Dictionary<string, string> DayWarningCollection = new Dictionary<string, string>();
@@ -136,7 +136,12 @@ namespace BarsGroup
                 string value;
                 if (!DayErrorCollection.TryGetValue(message, out value))
                     if (!DayErrorCollection.TryGetValue(e.Message, out value))
+                    {
                         SendToFile("ERROR", message);
+                        DayErrorCollection.Add(e.Message, message);
+                    }
+                        
+                        
             }
             catch (Exception ex)
             {
