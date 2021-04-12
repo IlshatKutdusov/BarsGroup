@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Timers;
 
 namespace Chat
 {
@@ -10,11 +11,14 @@ namespace Chat
         private readonly string _host;
         private readonly int _port;
         private string _chatKey, _userKey;
+        private int _topState;
 
         private Dictionary<long, string> _messageList = new Dictionary<long, string>();
 
         private ConnectionMultiplexer _redis;
         private IDatabase _dataBase;
+
+        private const double _checkInterval = 1000 * 3;
 
         public Chat(string host = "localhost", int port = 6379)
         {
@@ -60,6 +64,10 @@ namespace Chat
 
             DownloadMessage(true);
 
+            Timer inspector = new Timer(_checkInterval);
+            inspector.Elapsed += new ElapsedEventHandler(Checking);
+            inspector.Start();
+
             ChattingStart();
         }
 
@@ -81,8 +89,11 @@ namespace Chat
                 }
                 else
                 {
+                    Console.SetCursorPosition(0, _topState);
                     _messageList.Add(_dataBase.ListLength(_chatKey) - 1, _dataBase.ListGetByIndex(_chatKey, _dataBase.ListLength(_chatKey) - 1));
                     Console.WriteLine("{0}", _messageList[_dataBase.ListLength(_chatKey) - 1]);
+                    Console.Write("<{0}>: ", _userKey);
+                    _topState = Console.CursorTop;
                 }
             }
         }
@@ -92,6 +103,8 @@ namespace Chat
             do
             {
                 Console.Write("<{0}>: ", _userKey);
+                _topState = Console.CursorTop;
+
                 string message = Console.ReadLine();
                 if (message != "/exit" && message != "")
                 {
@@ -102,6 +115,16 @@ namespace Chat
                     break;
 
             } while (true);
+        }
+
+        private void Checking(object obj, ElapsedEventArgs e)
+        {
+            if (_messageList.Count != _dataBase.ListLength(_chatKey))
+            {
+                DownloadMessage(false);
+            }
+            /*else
+                Console.WriteLine("Произошла проверка!");*/
         }
     }
 }
