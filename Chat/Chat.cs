@@ -48,83 +48,109 @@ namespace Chat
 
         private void Init()
         {
-            var conf = new ConfigurationOptions();
-            conf.EndPoints.Add(_host, _port);
+            try
+            {
+                var conf = new ConfigurationOptions();
+                conf.EndPoints.Add(_host, _port);
 
-            _redis = ConnectionMultiplexer.Connect(conf);
-            _dataBase = _redis.GetDatabase(0);
+                _redis = ConnectionMultiplexer.Connect(conf);
+                _dataBase = _redis.GetDatabase(0);
 
-            Console.WriteLine("Укажите чат:");
-            _chatKey = ValidatingConsoleInput();
+                Console.WriteLine("Укажите чат:");
+                _chatKey = ValidatingConsoleInput();
 
-            Console.WriteLine("Введите свой ник:");
-            _userKey = ValidatingConsoleInput();
+                Console.WriteLine("Введите свой ник:");
+                _userKey = ValidatingConsoleInput();
 
-            Console.WriteLine("Добро пожаловать в чат {0}, {1}!", _chatKey, _userKey);
+                Console.WriteLine("Добро пожаловать в чат {0}, {1}!", _chatKey, _userKey);
 
-            DownloadMessage(true);
+                DownloadMessage(true);
 
-            Timer inspector = new Timer(_checkInterval);
-            inspector.Elapsed += new ElapsedEventHandler(Checking);
-            inspector.Start();
+                Timer inspector = new Timer(_checkInterval);
+                inspector.Elapsed += new ElapsedEventHandler(Checking);
+                inspector.Start();
 
-            ChattingStart();
+                ChattingStart();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error! Message: " + ex.Message);
+            }
         }
 
         private void DownloadMessage(bool all)
         {
-            if (_dataBase.KeyExists(_chatKey))
+            try
             {
-                if (all == true)
+                if (_dataBase.KeyExists(_chatKey))
                 {
-                    for (int i = 0; i < _dataBase.ListLength(_chatKey); i++)
+                    if (all == true)
                     {
-                        _messageList.Add(i, _dataBase.ListGetByIndex(_chatKey, i));
-                    }
+                        for (int i = 0; i < _dataBase.ListLength(_chatKey); i++)
+                        {
+                            _messageList.Add(i, _dataBase.ListGetByIndex(_chatKey, i));
+                        }
 
-                    foreach (var message in _messageList)
+                        foreach (var message in _messageList)
+                        {
+                            Console.WriteLine("{0}", message.Value);
+                        }
+                    }
+                    else
                     {
-                        Console.WriteLine("{0}", message.Value);
+                        Console.SetCursorPosition(0, _topState);
+                        _messageList.Add(_dataBase.ListLength(_chatKey) - 1, _dataBase.ListGetByIndex(_chatKey, _dataBase.ListLength(_chatKey) - 1));
+                        Console.WriteLine("{0}", _messageList[_dataBase.ListLength(_chatKey) - 1]);
+                        Console.Write("<{0}>: ", _userKey);
+                        _topState = Console.CursorTop;
                     }
                 }
-                else
-                {
-                    Console.SetCursorPosition(0, _topState);
-                    _messageList.Add(_dataBase.ListLength(_chatKey) - 1, _dataBase.ListGetByIndex(_chatKey, _dataBase.ListLength(_chatKey) - 1));
-                    Console.WriteLine("{0}", _messageList[_dataBase.ListLength(_chatKey) - 1]);
-                    Console.Write("<{0}>: ", _userKey);
-                    _topState = Console.CursorTop;
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error! Message: " + ex.Message);
             }
         }
 
         private void ChattingStart()
         {
-            do
+            try
             {
-                Console.Write("<{0}>: ", _userKey);
-                _topState = Console.CursorTop;
-
-                string message = Console.ReadLine();
-                if (message != "/exit" && message != "")
+                do
                 {
-                    _dataBase.ListRightPush(_chatKey, $"<{_userKey}>: {message}");
-                    _messageList.Add(_messageList.Count, message);
-                }
-                else
-                    break;
+                    Console.Write("<{0}>: ", _userKey);
+                    _topState = Console.CursorTop;
 
-            } while (true);
+                    string message = Console.ReadLine();
+                    if (message != "/exit" && message != "")
+                    {
+                        _dataBase.ListRightPush(_chatKey, $"<{_userKey}>: {message}");
+                        _messageList.Add(_messageList.Count, message);
+                    }
+                    else
+                        break;
+
+                } while (true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error! Message: " + ex.Message);
+            }
         }
 
         private void Checking(object obj, ElapsedEventArgs e)
         {
-            if (_messageList.Count != _dataBase.ListLength(_chatKey))
+            try
             {
-                DownloadMessage(false);
+                if (_messageList.Count != _dataBase.ListLength(_chatKey))
+                {
+                    DownloadMessage(false);
+                }
             }
-            /*else
-                Console.WriteLine("Произошла проверка!");*/
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error! Message: " + ex.Message);
+            }
         }
     }
 }
