@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Timers;
 
 namespace Chat
 {
@@ -17,6 +16,10 @@ namespace Chat
 
         private ConnectionMultiplexer _redis;
         private IDatabase _dataBase;
+        private ChannelMessageQueue _sub;
+
+        private delegate void newMessage(EventArgs args);
+        private event newMessage MessagePubliched;
 
         private const double _checkInterval = 1000 * 3;
 
@@ -54,6 +57,8 @@ namespace Chat
                 conf.EndPoints.Add(_host, _port);
 
                 _redis = ConnectionMultiplexer.Connect(conf);
+                _sub = _redis.GetSubscriber().Subscribe("news");
+                _sub.OnMessage(message => { DownloadMessage(false); } );
                 _dataBase = _redis.GetDatabase(0);
 
                 Console.WriteLine("Укажите чат:");
@@ -65,10 +70,6 @@ namespace Chat
                 Console.WriteLine("Добро пожаловать в чат {0}, {1}!", _chatKey, _userKey);
 
                 DownloadMessage(true);
-
-                Timer inspector = new Timer(_checkInterval);
-                inspector.Elapsed += new ElapsedEventHandler(Checking);
-                inspector.Start();
 
                 ChattingStart();
             }
@@ -95,6 +96,8 @@ namespace Chat
                         {
                             Console.WriteLine("{0}", message.Value);
                         }
+
+                        _topState = Console.CursorTop;
                     }
                     else
                     {
@@ -119,33 +122,17 @@ namespace Chat
                 do
                 {
                     Console.Write("<{0}>: ", _userKey);
-                    _topState = Console.CursorTop;
 
                     string message = Console.ReadLine();
                     if (message != "/exit" && message != "")
                     {
                         _dataBase.ListRightPush(_chatKey, $"<{_userKey}>: {message}");
-                        _messageList.Add(_messageList.Count, message);
+                        _dataBase.Publish("news", $"<{_userKey}>: {message}");
                     }
                     else
                         break;
 
                 } while (true);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error! Message: " + ex.Message);
-            }
-        }
-
-        private void Checking(object obj, ElapsedEventArgs e)
-        {
-            try
-            {
-                if (_messageList.Count != _dataBase.ListLength(_chatKey))
-                {
-                    DownloadMessage(false);
-                }
             }
             catch (Exception ex)
             {
