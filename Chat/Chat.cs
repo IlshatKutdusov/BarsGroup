@@ -18,11 +18,6 @@ namespace Chat
         private IDatabase _dataBase;
         private ChannelMessageQueue _sub;
 
-        private delegate void newMessage(EventArgs args);
-        private event newMessage MessagePubliched;
-
-        private const double _checkInterval = 1000 * 3;
-
         public Chat(string host = "localhost", int port = 6379)
         {
             this._host = host;
