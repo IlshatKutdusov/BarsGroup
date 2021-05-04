@@ -7,7 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logger", "Logger\Logger.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SubsidyCalculation", "SubsidyCalculation\SubsidyCalculation.csproj", "{4CD35C9F-140A-4079-9036-CA253311C6A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat", "Chat\Chat.csproj", "{DAE712B2-F866-4584-A376-CFBBB7C15DF8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat", "Chat\Chat.csproj", "{DAE712B2-F866-4584-A376-CFBBB7C15DF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ", "RabbitMQ\RabbitMQ.csproj", "{DF2B4110-567F-458F-A030-2BB208BAB83D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ2", "RabbitMQ2\RabbitMQ2.csproj", "{B5231B3F-7085-4AB5-B069-A419FF4FE31B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{DAE712B2-F866-4584-A376-CFBBB7C15DF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAE712B2-F866-4584-A376-CFBBB7C15DF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAE712B2-F866-4584-A376-CFBBB7C15DF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF2B4110-567F-458F-A030-2BB208BAB83D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF2B4110-567F-458F-A030-2BB208BAB83D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF2B4110-567F-458F-A030-2BB208BAB83D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF2B4110-567F-458F-A030-2BB208BAB83D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5231B3F-7085-4AB5-B069-A419FF4FE31B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5231B3F-7085-4AB5-B069-A419FF4FE31B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5231B3F-7085-4AB5-B069-A419FF4FE31B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5231B3F-7085-4AB5-B069-A419FF4FE31B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
