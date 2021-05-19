@@ -1,7 +1,7 @@
 ﻿namespace _1_SOLID
 {
     /// <summary>
-    /// Сотрудник
+    /// Основной класс сотрудннка
     /// </summary>
     public class Employee
     {

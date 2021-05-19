@@ -1,7 +1,8 @@
 ﻿namespace _1_SOLID
 {
     /// <summary>
-    /// Почта
+    /// Основной класс почты
+    /// Имеет метод для отпраки email-письма
     /// </summary>
     public class Email : IMessenger
     {
